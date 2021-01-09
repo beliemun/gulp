@@ -4,5 +4,15 @@
   "main": "index.js",
   "repository": "https://github.com/beliemun/supergulp.git",
   "author": "beliemun <beliemun@paran.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "dev": "gulp dev",
+    "build": "gulp build"
+  },
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "@babel/core": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
+    "@babel/register": "^7.12.10"
+  }
 }
