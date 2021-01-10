@@ -8,6 +8,7 @@ import autoPreFixer from "gulp-autoprefixer";
 import miniCSS from "gulp-csso";
 import gulpBro from "gulp-bro";
 import babelify from "babelify";
+import phPages from "gulp-gh-pages";
 
 gulpSass.compiler = require("node-sass");
 
@@ -43,7 +44,7 @@ export const pug = () =>
 // Task란 pug파일들은 HTML파일로 변환하거나, SCSS파일들을 CSS파일로 변환하거나,
 // 이미지를 최적화하고 JS를 압축하는 등의 말하고 각 Task를 나누거나 묶어서 만들 수 있다.
 
-export const clean = () => del(["build"]);
+export const clean = () => del(["build", ".publish"]);
 
 const webserver = () => {
   gulp.src("build");
@@ -87,6 +88,8 @@ const js = () =>
     .pipe(gulp.dest(routes.js.dest))
     .pipe(connect.reload());
 
+const gh = () => gulp.src("build/**/*").pipe(phPages());
+
 const detectChaged = () => {
   gulp.watch(routes.pug.watch, pug);
   gulp.watch(routes.img.src, img);
@@ -99,7 +102,8 @@ const detectChaged = () => {
 
 const prepare = gulp.series([clean, img]);
 const assets = gulp.series([pug, styles, js]);
-const postDev = gulp.series([webserver]);
-const watch = gulp.series([detectChaged])
+const live = gulp.series([webserver, detectChaged]);
 
-export const dev = gulp.series([prepare, assets, postDev, watch]);
+export const build = gulp.series([prepare, assets]);
+export const dev = gulp.series([build, live]);
+export const deploy = gulp.series([build, gh, clean]);
