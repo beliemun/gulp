@@ -1,7 +1,8 @@
 import gulp from "gulp";
-import gulpPug from "gulp-pug";
-import del from "del";
 import connect from "gulp-connect";
+import gulpPug from "gulp-pug";
+import gulpImage from "gulp-image";
+import del from "del";
 
 const routes = {
   pug: {
@@ -9,6 +10,10 @@ const routes = {
     src: "src/*.pug",
     dest: "build",
   },
+  img: {
+    src: "src/img/*",
+    dest: "build/img"
+  }
 };
 
 export const pug = () =>
@@ -35,14 +40,21 @@ const webserver = () => {
   })
 }
 
+const img = () =>
+  gulp.src(routes.img.src)
+    .pipe(gulpImage())
+    .pipe(gulp.dest(routes.img.dest))
+    .pipe(connect.reload());
+
 const detectChaged = () => {
   gulp.watch(routes.pug.watch, pug);
+  gulp.watch(routes.img.src, img);
   return new Promise((resolve, reject) => {
     resolve();
   })
 }
 
-const prepare = gulp.series([clean]);
+const prepare = gulp.series([clean, img]);
 const assets = gulp.series([pug]);
 const postDev = gulp.series([webserver]);
 const watch = gulp.series([detectChaged])
