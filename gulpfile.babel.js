@@ -6,6 +6,8 @@ import gulpImage from "gulp-image";
 import gulpSass from "gulp-sass";
 import autoPreFixer from "gulp-autoprefixer";
 import miniCSS from "gulp-csso";
+import gulpBro from "gulp-bro";
+import babelify from "babelify";
 
 gulpSass.compiler = require("node-sass");
 
@@ -23,6 +25,11 @@ const routes = {
     watch: "src/scss/**/*.scss",
     src: "src/scss/styles.scss",
     dest: "build/css"
+  },
+  js: {
+    watch: "src/js/**/*.js",
+    src: "src/js/main.js",
+    dest: "build/js"
   }
 };
 
@@ -39,41 +46,59 @@ export const pug = () =>
 export const clean = () => del(["build"]);
 
 const webserver = () => {
-  gulp.src("build")
+  gulp.src("build");
   connect.server({
     root: "build",
     livereload: true,
     port: 8000
-  })
+  });
   return new Promise((resolve, reject) => {
     resolve();
-  })
+  });
 }
 
 const img = () =>
-  gulp.src(routes.img.src)
+  gulp
+    .src(routes.img.src)
     .pipe(gulpImage())
     .pipe(gulp.dest(routes.img.dest))
     .pipe(connect.reload());
 
-const styles = () => gulp.src(routes.scss.src)
-  .pipe(gulpSass().on("Error", gulpSass.logError))
-  .pipe(autoPreFixer(["last 2 versions"]))
-  .pipe(miniCSS())
-  .pipe(gulp.dest(routes.scss.dest))
-  .pipe(connect.reload());
+const styles = () =>
+  gulp
+    .src(routes.scss.src)
+    .pipe(gulpSass().on("Error", gulpSass.logError))
+    .pipe(autoPreFixer(["last 2 versions"]))
+    .pipe(miniCSS())
+    .pipe(gulp.dest(routes.scss.dest))
+    .pipe(connect.reload());
+
+const js = () =>
+  gulp
+    .src(routes.js.src)
+    .pipe(
+      gulpBro({
+        transform: [
+          babelify.configure({ presets: ['@babel/preset-env'] }),
+          ['uglifyify', { global: true }]
+        ]
+      })
+    )
+    .pipe(gulp.dest(routes.js.dest))
+    .pipe(connect.reload());
 
 const detectChaged = () => {
   gulp.watch(routes.pug.watch, pug);
   gulp.watch(routes.img.src, img);
   gulp.watch(routes.scss.watch, styles);
+  gulp.watch(routes.js.watch, js);
   return new Promise((resolve, reject) => {
     resolve();
   })
 }
 
 const prepare = gulp.series([clean, img]);
-const assets = gulp.series([pug, styles]);
+const assets = gulp.series([pug, styles, js]);
 const postDev = gulp.series([webserver]);
 const watch = gulp.series([detectChaged])
 
