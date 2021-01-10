@@ -3,4 +3,16 @@
 
 body {
   background-color: $green;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height:100vh;
+  font-size:20px;
+  color:white;
+  line-height: 30px;
+}
+
+img {
+  width: 100px;
 }
