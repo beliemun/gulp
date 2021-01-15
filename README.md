@@ -5,4 +5,4 @@
 <br><br>
 
 **기본 화면**<br><br>
-<img width=600 src="https://github.com/beliemun/super-gulp/blob/master/md/screen_shot.png?raw=true"/><br><br>
+<img width=600 src="https://github.com/beliemun/super-gulp/blob/main/md/screen_shot.png?raw=true"/><br><br>
